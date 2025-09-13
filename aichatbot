@@ -1,0 +1,89 @@
+import streamlit as st
+
+# --- Page Configuration ---
+st.set_page_config(page_title="Simple AI Chatbot", layout="centered")
+
+# --- Custom CSS Styling ---
+st.markdown("""
+    <style>
+        .chat-container {
+            background-color: #f0f2f6;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        .chat-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #4a4a4a;
+            margin-bottom: 1rem;
+        }
+        .user-input {
+            margin-top: 1rem;
+        }
+        .response-box {
+            background-color: #ffffff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: #333333;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- Logic Functions ---
+def rule_based(user_input):
+    user_input = user_input.lower()
+    if "hello" in user_input or "hi" in user_input:
+        return "🤝 Hello! How can I help you?"
+    elif "bye" in user_input:
+        return "👋 Goodbye! Have a nice day!"
+    else:
+        return None
+
+def decision_based(user_input):
+    user_input = user_input.lower()
+    if "hey" in user_input:
+        return "🙌 Hey there!"
+    elif "how are you?" in user_input:
+        return "😊 I'm good, what about you?"
+    elif "i'm good" in user_input or "i am good" in user_input:
+        return "😄 That's great to hear!"
+    else:
+        return "🤔 Can you rephrase?"
+
+def chatbot_response(user_input):
+    response = rule_based(user_input)
+    if response:
+        return response
+    else:
+        return decision_based(user_input)
+
+# --- UI Layout ---
+st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+st.markdown('<div class="chat-title">🤖 Simple AI Chatbot</div>', unsafe_allow_html=True)
+
+user_input = st.text_input("You:", placeholder="Say something like hello, bye, help, etc.", key="user_input")
+
+if user_input:
+    response = chatbot_response(user_input)
+    st.markdown(f'<div class="response-box">🤖: {response}</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Store conversation history in session state
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# Capture input and generate response
+if user_input:
+    response = chatbot_response(user_input)
+    st.session_state.history.append(("You", user_input))
+    st.session_state.history.append(("Bot", response))
+
+if st.button("🧹 Clear Chat"):
+    st.session_state.history = []
